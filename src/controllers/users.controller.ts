@@ -19,26 +19,26 @@ export class UsersController extends Controller {
   @Get("{userId}")
   public async getUser(
     @Path() userId: string,
-  ): Promise<GetUser | GetUser[] | Error> {
+  ): Promise<GetUser | { message: string }> {
     console.log("userId received:", userId)
-    try {
-      return await new UsersService().get(userId);
-    } catch (error) {
-      this.setStatus(404);
-      return error as Error;
+    const result = await new UsersService().get(userId);
+    if ('error' in result) {
+      this.setStatus(403); // or another appropriate status
+      return { message: result.message };
     }
+    return result as GetUser;
   }
 
   @SuccessResponse("200", "OK") // Custom success response
   @Security('jwt', ['admin'])
   @Get("")
-  public async getUsers(): Promise<GetUser | Error | GetUser[]> {
-    try {
-      return await new UsersService().get();
-    } catch (error) {
-        this.setStatus(404);
-        return error as Error;
+  public async getUsers(): Promise<GetUser[] | { message: string }> {
+    const result = await new UsersService().get();
+    if ('error' in result) {
+      this.setStatus(403); // or another appropriate status
+      return { message: result.message };
     }
+    return result as GetUser[];
   }
 }
 

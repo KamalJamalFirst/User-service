@@ -3,11 +3,11 @@ import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
 import { AppDataSource } from "../data-source";
 import { Users } from "../entity/users";
-import { GetUser, Register, Registered } from "../interface/user";
+import { ErrorResponse, GetUser, Register, Registered } from "../interface/user";
 import { dedupCheck } from "../helpers/dedupCheck";
 
 export class UsersService {
-  public async get(id?: string): Promise<GetUser | GetUser[]> {
+  public async get(id?: string): Promise<ErrorResponse | GetUser | GetUser[]> {
     const usersRepository = AppDataSource.getRepository(Users)
     
     if (id) {
@@ -22,7 +22,7 @@ export class UsersService {
                 status: user.status
             })
         }
-        throw new Error("User wasn't found");
+        return { error: true, message: "User wasn't found" };
     }
     
 
@@ -37,7 +37,7 @@ export class UsersService {
             status: user.status
         }))
     }
-    throw new Error("Users wasn't found")
+    return { error: true, message: "Users wasn't found" };
 
   }
 

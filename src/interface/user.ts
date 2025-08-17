@@ -30,3 +30,5 @@ export interface GetUser {
     dateOfBirth: string;
     status: "active" | "disabled";
 }
+
+export type ErrorResponse = { error: boolean; message: string };

@@ -43,6 +43,22 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"Registered": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"token": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"id",
+					"token"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"Error": {
 				"properties": {
 					"name": {
@@ -58,22 +74,6 @@
 				"required": [
 					"name",
 					"message"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Registered": {
-				"properties": {
-					"id": {
-						"type": "string"
-					},
-					"token": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"id",
-					"token"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -139,13 +139,15 @@
 											"$ref": "#/components/schemas/GetUser"
 										},
 										{
-											"items": {
-												"$ref": "#/components/schemas/GetUser"
+											"properties": {
+												"message": {
+													"type": "string"
+												}
 											},
-											"type": "array"
-										},
-										{
-											"$ref": "#/components/schemas/Error"
+											"required": [
+												"message"
+											],
+											"type": "object"
 										}
 									]
 								}
@@ -183,16 +185,21 @@
 								"schema": {
 									"anyOf": [
 										{
-											"$ref": "#/components/schemas/GetUser"
-										},
-										{
-											"$ref": "#/components/schemas/Error"
-										},
-										{
 											"items": {
 												"$ref": "#/components/schemas/GetUser"
 											},
 											"type": "array"
+										},
+										{
+											"properties": {
+												"message": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"message"
+											],
+											"type": "object"
 										}
 									]
 								}
