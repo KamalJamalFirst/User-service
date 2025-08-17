@@ -1,0 +1,255 @@
+{
+	"openapi": "3.0.0",
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"GetUser": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"firstname": {
+						"type": "string"
+					},
+					"lastname": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"dateOfBirth": {
+						"type": "string"
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"active",
+							"disabled"
+						]
+					}
+				},
+				"required": [
+					"id",
+					"firstname",
+					"lastname",
+					"email",
+					"dateOfBirth",
+					"status"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Error": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"message": {
+						"type": "string"
+					},
+					"stack": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"name",
+					"message"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Registered": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"token": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"id",
+					"token"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Register": {
+				"properties": {
+					"firstname": {
+						"type": "string"
+					},
+					"lastname": {
+						"type": "string"
+					},
+					"dateOfBirth": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"firstname",
+					"lastname",
+					"dateOfBirth",
+					"email",
+					"password"
+				],
+				"type": "object",
+				"additionalProperties": false
+			}
+		},
+		"securitySchemes": {
+			"jwt": {
+				"type": "apiKey",
+				"name": "access_token",
+				"in": "header",
+				"description": "JWT token for authentication"
+			}
+		}
+	},
+	"info": {
+		"title": "user-service",
+		"version": "1.0.0",
+		"license": {
+			"name": "ISC"
+		},
+		"contact": {}
+	},
+	"paths": {
+		"/api/users/{userId}": {
+			"get": {
+				"operationId": "GetUser",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/GetUser"
+										},
+										{
+											"items": {
+												"$ref": "#/components/schemas/GetUser"
+											},
+											"type": "array"
+										},
+										{
+											"$ref": "#/components/schemas/Error"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "userId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/api/users": {
+			"get": {
+				"operationId": "GetUsers",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/GetUser"
+										},
+										{
+											"$ref": "#/components/schemas/Error"
+										},
+										{
+											"items": {
+												"$ref": "#/components/schemas/GetUser"
+											},
+											"type": "array"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": [
+							"admin"
+						]
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/api/register": {
+			"post": {
+				"operationId": "CreateUser",
+				"responses": {
+					"201": {
+						"description": "Created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/Registered"
+										},
+										{
+											"$ref": "#/components/schemas/Error"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Register"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/."
+		}
+	]
+}
