@@ -34,7 +34,7 @@ export interface GetUser {
 }
 
 export interface DisableUser {
-    id?: string;
+    id: string;
 }
 
 export type MissingParam = { missing: string; message: string };

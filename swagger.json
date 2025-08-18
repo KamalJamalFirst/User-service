@@ -94,6 +94,18 @@
 				},
 				"type": "object",
 				"additionalProperties": false
+			},
+			"DisableUser": {
+				"properties": {
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"id"
+				],
+				"type": "object",
+				"additionalProperties": false
 			}
 		},
 		"securitySchemes": {
@@ -223,15 +235,50 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"anyOf": [
-									{
-										"$ref": "#/components/schemas/Register"
+								"$ref": "#/components/schemas/Register"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/disable": {
+			"put": {
+				"operationId": "DisableUser",
+				"responses": {
+					"201": {
+						"description": "Created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
 									},
-									{
-										"properties": {},
-										"type": "object"
-									}
-								]
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/DisableUser"
 							}
 						}
 					}

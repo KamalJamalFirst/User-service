@@ -7,6 +7,8 @@ import {  fetchMiddlewares, ExpressTemplateService } from '@tsoa/runtime';
 import { UsersController } from './src/controllers/users.controller';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { RegisterController } from './src/controllers/users.controller';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { DisableController } from './src/controllers/users.controller';
 import { expressAuthentication } from './src/decorators/authentication.decorators';
 // @ts-ignore - no great way to install types from subpackage
 import type { Request as ExRequest, Response as ExResponse, RequestHandler, Router } from 'express';
@@ -52,6 +54,14 @@ const models: TsoaRoute.Models = {
             "dateOfBirth": {"dataType":"string"},
             "email": {"dataType":"string"},
             "password": {"dataType":"string"},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "DisableUser": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
@@ -135,7 +145,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsRegisterController_createUser: Record<string, TsoaRoute.ParameterSchema> = {
-                request: {"in":"body","name":"request","required":true,"dataType":"union","subSchemas":[{"ref":"Register"},{"dataType":"nestedObjectLiteral","nestedProperties":{}}]},
+                request: {"in":"body","name":"request","required":true,"ref":"Register"},
         };
         app.post('/api/register',
             ...(fetchMiddlewares<RequestHandler>(RegisterController)),
@@ -153,6 +163,37 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'createUser',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 201,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsDisableController_disableUser: Record<string, TsoaRoute.ParameterSchema> = {
+                request: {"in":"body","name":"request","required":true,"ref":"DisableUser"},
+        };
+        app.put('/api/disable',
+            authenticateMiddleware([{"jwt":["admin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(DisableController)),
+            ...(fetchMiddlewares<RequestHandler>(DisableController.prototype.disableUser)),
+
+            async function DisableController_disableUser(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsDisableController_disableUser, request, response });
+
+                const controller = new DisableController();
+
+              await templateService.apiHandler({
+                methodName: 'disableUser',
                 controller,
                 response,
                 next,

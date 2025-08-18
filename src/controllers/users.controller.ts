@@ -5,6 +5,7 @@ import {
   Get,
   Path,
   Post,
+  Put,
   //Res,
   Route,
   Security,
@@ -12,7 +13,7 @@ import {
   //TsoaResponse,
 } from "@tsoa/runtime";
 import { UsersService } from "../service/usersService";
-import { GetUser, MissingParam, Register, Registered } from "../interface/user";
+import { DisableUser, GetUser, MissingParam, Register, Registered } from "../interface/user";
 
 @Route("api/users")
 export class UsersController extends Controller {
@@ -41,13 +42,30 @@ export class RegisterController extends Controller {
   @SuccessResponse("201", "Created") // Custom success response
   @Post("")
   public async createUser(
-    @Body() request: Register | {}
+    @Body() request: Register
   ): Promise<Registered | { message: string | MissingParam[]}> {
     const result = await new UsersService().create(request);
     if (result && 'error' in result) {
 
       return { message: result.message };
     }
-    return result as Registered;
+    return result;
+    }
+}
+
+@Route("api/disable")
+export class DisableController extends Controller {
+  @SuccessResponse("201", "Created") // Custom success response
+  @Security('jwt', ['admin'])
+  @Put("")
+  public async disableUser(
+    @Body() request: DisableUser
+  ): Promise<{ message: string }> {
+    const result = await new UsersService().disable(request);
+    if (result && 'error' in result) {
+
+      return { message: result.message };
+    }
+    return result;
     }
 }
