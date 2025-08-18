@@ -13,7 +13,7 @@ import {
   //TsoaResponse,
 } from "@tsoa/runtime";
 import { UsersService } from "../service/usersService";
-import { DisableUser, GetUser, MissingParam, Register, Registered } from "../interface/user";
+import { GetUser, MissingParam, Register, Registered } from "../interface/user";
 
 @Route("api/users")
 export class UsersController extends Controller {
@@ -57,11 +57,11 @@ export class RegisterController extends Controller {
 export class DisableController extends Controller {
   @SuccessResponse("201", "Created") // Custom success response
   @Security('jwt', ['admin'])
-  @Put("")
+  @Put("{userId}")
   public async disableUser(
-    @Body() request: DisableUser
+    @Path() userId: string
   ): Promise<{ message: string }> {
-    const result = await new UsersService().disable(request);
+    const result = await new UsersService().disable(userId);
     if (result && 'error' in result) {
 
       return { message: result.message };

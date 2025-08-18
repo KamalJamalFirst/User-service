@@ -33,9 +33,6 @@ export interface GetUser {
     status: "active" | "disabled";
 }
 
-export interface DisableUser {
-    id: string;
-}
 
 export type MissingParam = { missing: string; message: string };
 export type ErrorResponse = { error: boolean; message: string | MissingParam[] };

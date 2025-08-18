@@ -17,7 +17,3 @@ export const RegSchema = z.object({
     email: z.email(),
     password: z.string().min(5, "Password must be at least 5 letters long"),
 });
-
-export const DisableUserSchema = z.object({
-    id: z.string()
-})

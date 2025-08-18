@@ -3,9 +3,9 @@ import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
 import { AppDataSource } from "../data-source";
 import { DisabledTokens, Users } from "../entity/users";
-import { DisableUser, ErrorResponse, GetUser, Register } from "../interface/user";
+import { ErrorResponse, GetUser, Register } from "../interface/user";
 import { dedupCheck } from "../helpers/dedupCheck";
-import { DisableUserSchema, RegSchema } from "../schema/user.schema";
+import { RegSchema } from "../schema/user.schema";
 
 export class UsersService {
   public async get(id?: string): Promise<ErrorResponse | GetUser | GetUser[]> {
@@ -87,25 +87,24 @@ export class UsersService {
  
   }
   
-  public async disable(userCreationParams: DisableUser ): Promise<any> {
-    const check = await DisableUserSchema.safeParseAsync(userCreationParams);
-    if (!check.success) {
-      return { error: false, message: 'User ID is missing' }
+  public async disable(id?: string ): Promise<any> {
+    if (!id) {
+      return { error: false, message: "User id is required" };
     }
-    const userUnique = await dedupCheck(userCreationParams.id)
+    const userUnique = await dedupCheck(id)
     if (!userUnique) {
       return { error: false, message: "User already disabled" };
     }
     const userRepository = AppDataSource.getRepository(Users);
-    const existingUser = await userRepository.findOneBy({ id: userCreationParams.id });
+    const existingUser = await userRepository.findOneBy({ id });
     if (!existingUser) {
       return { error: false, message: "User not found" };
     }
     existingUser.status = 'disabled';
     await userRepository.save(existingUser);
     const disabledRepository = AppDataSource.getRepository(DisabledTokens);
-    disabledRepository.insert({ token: userCreationParams.id });
-    return { message: `User ${userCreationParams.id} was disabled` };
+    disabledRepository.insert({ token: id });
+    return { message: `User ${id} was disabled` };
   }
 
   
