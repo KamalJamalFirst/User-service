@@ -5,6 +5,7 @@
     "lib": ["es2021", "dom"],
     "module": "commonjs",
     "outDir": "build",
+    "rootDir": ".",
 
     /* Strict Type-Checking Options */
     "strict": true,
@@ -35,9 +36,7 @@
     /* Advanced Options */
     "forceConsistentCasingInFileNames": true
   },
-    "include": [
-      "src/**/*.ts"
-  ],
+  "include": ["**/*.ts", "tsoa.json"],
   "exclude": [
     "node_modules"
   ]

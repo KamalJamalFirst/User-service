@@ -6,7 +6,7 @@
   "spec": {
     "outputDirectory": ".",
     "specVersion": 3,
-    "basePath": "/api",
+    "basePath": ".",
     "securityDefinitions": {
       "jwt": {
         "type": "apiKey",
@@ -17,8 +17,9 @@
     }
   },
   "routes": {
-    "routesDir": "src",
+    "routesDir": ".",
+    "controllerPathGlobs": ["src/**/*controller.ts"],
     "middleware": "express",
-    "authenticationModule": "./src/authentication/authentication.ts"
+    "authenticationModule": "./src/decorators/authentication.decorators.ts"
   }
 }

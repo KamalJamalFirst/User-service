@@ -5,16 +5,16 @@ import {
   Get,
   Path,
   Post,
-  Res,
+  //Res,
   Route,
   Security,
   SuccessResponse,
-  TsoaResponse,
+  //TsoaResponse,
 } from "@tsoa/runtime";
 import { UsersService } from "../service/usersService";
-import { GetUser, Register, Registered } from "../interface/user";
+import { GetUser, MissingParam, Register, Registered } from "../interface/user";
 
-@Route("users")
+@Route("api/users")
 export class UsersController extends Controller {
   @SuccessResponse("200", "OK") // Custom success response
   @Security('jwt', ['user'])
@@ -25,17 +25,13 @@ export class UsersController extends Controller {
     const result = await new UsersService().get(userId);
     return result as GetUser;
   }
+  
 
   @SuccessResponse("200", "OK") // Custom success response
   @Security('jwt', ['admin'])
   @Get("")
-  public async getUsers(
-    @Res() res403: TsoaResponse<403, { message: string }>
-  ): Promise<GetUser[]> {
+  public async getUsers(): Promise<GetUser[]> {
     const result = await new UsersService().get();
-    if (result && 'error' in result) {
-      return res403(403, { message: result.message });
-    }
     return result as GetUser[];
   }
 }
@@ -43,16 +39,15 @@ export class UsersController extends Controller {
 @Route("api/register")
 export class RegisterController extends Controller {
   @SuccessResponse("201", "Created") // Custom success response
-  @Post()
+  @Post("")
   public async createUser(
-    @Body() requestBody: Register
-  ): Promise<Registered | Error> {
-      try {
-        console.log(requestBody)
-        return await new UsersService().create(requestBody);
-      } catch (error) {
-          this.setStatus(404);
-          return error as Error;
-      }
-  }
+    @Body() request: Register | {}
+  ): Promise<Registered | { message: string | MissingParam[]}> {
+    const result = await new UsersService().create(request);
+    if (result && 'error' in result) {
+
+      return { message: result.message };
+    }
+    return result as Registered;
+    }
 }

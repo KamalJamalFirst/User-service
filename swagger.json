@@ -59,24 +59,20 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Error": {
+			"MissingParam": {
 				"properties": {
-					"name": {
-						"type": "string"
-					},
 					"message": {
 						"type": "string"
 					},
-					"stack": {
+					"missing": {
 						"type": "string"
 					}
 				},
 				"required": [
-					"name",
-					"message"
+					"message",
+					"missing"
 				],
-				"type": "object",
-				"additionalProperties": false
+				"type": "object"
 			},
 			"Register": {
 				"properties": {
@@ -96,13 +92,6 @@
 						"type": "string"
 					}
 				},
-				"required": [
-					"firstname",
-					"lastname",
-					"dateOfBirth",
-					"email",
-					"password"
-				],
 				"type": "object",
 				"additionalProperties": false
 			}
@@ -125,7 +114,7 @@
 		"contact": {}
 	},
 	"paths": {
-		"/users/{userId}": {
+		"/api/users/{userId}": {
 			"get": {
 				"operationId": "GetUser",
 				"responses": {
@@ -159,7 +148,7 @@
 				]
 			}
 		},
-		"/users": {
+		"/api/users": {
 			"get": {
 				"operationId": "GetUsers",
 				"responses": {
@@ -172,24 +161,6 @@
 										"$ref": "#/components/schemas/GetUser"
 									},
 									"type": "array"
-								}
-							}
-						}
-					},
-					"403": {
-						"description": "",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"message"
-									],
-									"type": "object"
 								}
 							}
 						}
@@ -219,7 +190,25 @@
 											"$ref": "#/components/schemas/Registered"
 										},
 										{
-											"$ref": "#/components/schemas/Error"
+											"properties": {
+												"message": {
+													"anyOf": [
+														{
+															"type": "string"
+														},
+														{
+															"items": {
+																"$ref": "#/components/schemas/MissingParam"
+															},
+															"type": "array"
+														}
+													]
+												}
+											},
+											"required": [
+												"message"
+											],
+											"type": "object"
 										}
 									]
 								}
@@ -234,7 +223,15 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/Register"
+								"anyOf": [
+									{
+										"$ref": "#/components/schemas/Register"
+									},
+									{
+										"properties": {},
+										"type": "object"
+									}
+								]
 							}
 						}
 					}
@@ -244,7 +241,7 @@
 	},
 	"servers": [
 		{
-			"url": "/api"
+			"url": "/."
 		}
 	]
 }

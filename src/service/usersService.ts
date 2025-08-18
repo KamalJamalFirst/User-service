@@ -2,9 +2,10 @@ import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
 import { AppDataSource } from "../data-source";
-import { Users } from "../entity/users";
-import { ErrorResponse, GetUser, Register, Registered } from "../interface/user";
+import { DisabledTokens, Users } from "../entity/users";
+import { DisableUser, ErrorResponse, GetUser, Register } from "../interface/user";
 import { dedupCheck } from "../helpers/dedupCheck";
+import { DisableUserSchema, RegSchema } from "../schema/user.schema";
 
 export class UsersService {
   public async get(id?: string): Promise<ErrorResponse | GetUser | GetUser[]> {
@@ -40,28 +41,72 @@ export class UsersService {
     return { error: true, message: "Users wasn't found" };
 
   }
+//Registered | ErrorResponse | MissingParam[]
+  public async create(userCreationParams: Register): Promise<any> {
+    console.log("User creation params:", userCreationParams);
+    const check = await RegSchema.safeParseAsync(userCreationParams);
 
-  public async create(userCreationParams: Register): Promise<Registered> {
-    const userUnique = await dedupCheck(userCreationParams.email)
-    if (!userUnique) {
-        throw new Error("User already exists");
+    if (!check.success) {
+      const issues = check.error.issues.map(issue => ({
+        missing: `${issue.path}`,
+        message: issue.message,
+      }));
+
+      return { error: true, message: issues }
     }
-    const hashedpwd = bcrypt.hashSync(userCreationParams.password, 10)
-    const newId = uuidv4()
-    const newJwt = jwt.sign({ id: newId, role: 'user' }, 'your-secret-key')
-    const userRepository = AppDataSource.getRepository(Users)
-    const user = new Users();
-    user.id = newId;
-    user.role = 'user';
-    user.status = 'active';
-    user.firstName = userCreationParams.firstname;
-    user.lastName = userCreationParams.lastname;
-    user.dateOfBirth = userCreationParams.dateOfBirth;
-    user.email = userCreationParams.email;
-    user.password = hashedpwd;
-    await userRepository.save(user);
-    
+    if (
+      userCreationParams.firstname 
+      && userCreationParams.lastname
+      && userCreationParams.email
+      && userCreationParams.password
+      && userCreationParams.dateOfBirth
+    ) {
+      const userUnique = await dedupCheck(userCreationParams.email)
+      if (!userUnique) {
+        return { error: true, message: "User already exists" };
+      }
 
-    return {id: newId, token: newJwt};
+      const hashedpwd = bcrypt.hashSync(userCreationParams.password, 10)
+      const newId = uuidv4()
+      const newJwt = jwt.sign({ id: newId, role: 'user' }, 'your-secret-key')
+      const userRepository = AppDataSource.getRepository(Users)
+      const user = new Users();
+      user.id = newId;
+      user.role = 'user';
+      user.status = 'active';
+      user.firstName = userCreationParams.firstname;
+      user.lastName = userCreationParams.lastname;
+      user.dateOfBirth = userCreationParams.dateOfBirth;
+      user.email = userCreationParams.email;
+      user.password = hashedpwd;
+      await userRepository.save(user);
+      
+
+      return {id: newId, token: newJwt};
+    }
+ 
   }
+  
+  public async disable(userCreationParams: DisableUser ): Promise<any> {
+    const check = await DisableUserSchema.safeParseAsync(userCreationParams);
+    if (!check.success) {
+      return { error: false, message: 'User ID is missing' }
+    }
+    const userUnique = await dedupCheck(userCreationParams.id)
+    if (!userUnique) {
+      return { error: false, message: "User already disabled" };
+    }
+    const userRepository = AppDataSource.getRepository(Users);
+    const existingUser = await userRepository.findOneBy({ id: userCreationParams.id });
+    if (!existingUser) {
+      return { error: false, message: "User not found" };
+    }
+    existingUser.status = 'disabled';
+    await userRepository.save(existingUser);
+    const disabledRepository = AppDataSource.getRepository(DisabledTokens);
+    disabledRepository.insert({ token: userCreationParams.id });
+    return { message: `User ${userCreationParams.id} was disabled` };
+  }
+
+  
 }

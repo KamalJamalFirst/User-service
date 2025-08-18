@@ -7,15 +7,14 @@ export async function expressAuthentication(
   securityName: string,
   scopes?: string[]
 
-): Promise<void> {
+): Promise<void | Error> {
     if (securityName !== 'jwt') {
-        return Promise.reject({ status: 401, message: 'Invalid security scheme' });
+        throw new Error('Invalid security scheme' );
     }
     const token =  request.headers["access_token"] as string;
-    console.log(request.headers);
 
     if (!token) {
-        return Promise.reject({ status: 401, message: "No token provided" });
+        throw new Error("No token provided" );
     }
 
     let decoded;
@@ -24,23 +23,25 @@ export async function expressAuthentication(
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
-        return Promise.reject({ status: 401, message: "Invalid token" });
+        throw new Error("Invalid token" );
     }
     const isDisabled = await checkDisabled(token);
     if (isDisabled) {
-        return Promise.reject({ status: 403, message: "You don't have an access. User was disabled" });
+        throw new Error("You dont have an access. User was disabled" );
     }
 
     if (scopes && scopes.length > 0) {
         if (decoded.role !== scopes[0]) {
-            console.log("Access denied for role:", decoded.role);
-            return Promise.reject({ status: 403, message: "You don't have an access" });
+            //console.log("Access denied for role:", decoded);
+            
+            throw new Error("You dont have an access" );
         }
 
         if (decoded.role === 'user') {
             const userId = request.url.split('/').pop();
             if (userId !== decoded.id) {
-                return Promise.reject({ status: 403, message: 'User are only allowed to get info about himself' });
+                throw new Error("User are only allowed to get info about himself");
+                // return Promise.reject({ status: 403, message: 'User are only allowed to get info about himself' });
             }
         }
 

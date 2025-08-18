@@ -1,14 +1,23 @@
 import { AppDataSource } from "../data-source";
-import { Users } from "../entity/users";
+import { DisabledTokens, Users } from "../entity/users";
 
 export async function dedupCheck(
-    email: string
+    email?: string,
+    id?: string
 ): Promise<boolean> {
-    const userRepository = AppDataSource.getRepository(Users);
-    
-    const existingUser = await userRepository.findOneBy({ email });
+    if (email) {
+        const userRepository = AppDataSource.getRepository(Users);
+        const existingUser = await userRepository.findOneBy({ email });
+        if (existingUser) {
+            return false; // User already exists
+        }
+        return true;
+    }
+    const disabledRepository = AppDataSource.getRepository(DisabledTokens);
+    const existingUser = await disabledRepository.findOneBy({ token: id });
     if (existingUser) {
         return false; // User already exists
     }
     return true;
+
 }

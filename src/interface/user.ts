@@ -1,3 +1,5 @@
+
+
 export interface User {
     id: number;
     firstname: string;
@@ -10,11 +12,11 @@ export interface User {
 }
 
 export interface Register {
-    firstname: string;
-    lastname: string;
-    dateOfBirth: string;
-    email: string;
-    password: string;
+    firstname?: string;
+    lastname?: string;
+    dateOfBirth?: string;
+    email?: string;
+    password?: string;
 }
 
 export interface Registered {
@@ -31,4 +33,9 @@ export interface GetUser {
     status: "active" | "disabled";
 }
 
-export type ErrorResponse = { error: boolean; message: string };
+export interface DisableUser {
+    id?: string;
+}
+
+export type MissingParam = { missing: string; message: string };
+export type ErrorResponse = { error: boolean; message: string | MissingParam[] };
