@@ -81,7 +81,7 @@ export function RegisterRoutes(app: Router) {
         const argsUsersController_getUser: Record<string, TsoaRoute.ParameterSchema> = {
                 userId: {"in":"path","name":"userId","required":true,"dataType":"string"},
         };
-        app.get('/api/users/:userId',
+        app.get('/users/:userId',
             authenticateMiddleware([{"jwt":["user"]}]),
             ...(fetchMiddlewares<RequestHandler>(UsersController)),
             ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.getUser)),
@@ -110,8 +110,9 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsUsersController_getUsers: Record<string, TsoaRoute.ParameterSchema> = {
+                res403: {"in":"res","name":"403","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"message":{"dataType":"string","required":true}}},
         };
-        app.get('/api/users',
+        app.get('/users',
             authenticateMiddleware([{"jwt":["admin"]}]),
             ...(fetchMiddlewares<RequestHandler>(UsersController)),
             ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.getUsers)),

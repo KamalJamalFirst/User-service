@@ -2,42 +2,48 @@ import { Request } from "express";
 import * as jwt from "jsonwebtoken";
 import { checkDisabled } from "../helpers/checkDisabled";
 
-export function expressAuthentication(
+export async function expressAuthentication(
   request: Request,
   securityName: string,
   scopes?: string[]
-): Promise<void | { error: boolean; message: string }> {
+
+): Promise<void> {
     if (securityName !== 'jwt') {
-        return Promise.reject('Invalid security scheme');
+        return Promise.reject({ status: 401, message: 'Invalid security scheme' });
     }
     const token =  request.headers["access_token"] as string;
     console.log(request.headers);
-    const userId = request.url.split('/')[-1];
 
-    return new Promise((resolve) => {
-        if (!token) {
-            resolve({ error: true, message: "No token provided" });
+    if (!token) {
+        return Promise.reject({ status: 401, message: "No token provided" });
+    }
+
+    let decoded;
+    try {
+        decoded = jwt.verify(token, 'your-secret-key') as { id: string, role: string };
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+        return Promise.reject({ status: 401, message: "Invalid token" });
+    }
+    const isDisabled = await checkDisabled(token);
+    if (isDisabled) {
+        return Promise.reject({ status: 403, message: "You don't have an access. User was disabled" });
+    }
+
+    if (scopes && scopes.length > 0) {
+        if (decoded.role !== scopes[0]) {
+            console.log("Access denied for role:", decoded.role);
+            return Promise.reject({ status: 403, message: "You don't have an access" });
         }
-        const decoded = jwt.verify(token, 'your-secret-key') as { id: string, role: string };
-        console.log("Decoded JWT:", decoded);
-        if (scopes && scopes.length > 0) {
-            checkDisabled(token).then(res => {
-                console.log("Check disabled response:", res);
-                if (res) {
-                    resolve({ error: true, message: "You don't have an access. User was disabled" });
-                } else {
-                    if (scopes[0] === decoded.role && decoded.role === 'admin') {
-                    resolve();
-                    }
-                    if (scopes[0] === decoded.role && decoded.role === 'user') {
-                        if (!(userId === decoded.id)) {
-                            resolve({ error: true, message: 'User are only allowed to get info about himself' });
-                        }
-                        resolve();
-                    }
-                }
-                
-            })
+
+        if (decoded.role === 'user') {
+            const userId = request.url.split('/').pop();
+            if (userId !== decoded.id) {
+                return Promise.reject({ status: 403, message: 'User are only allowed to get info about himself' });
+            }
         }
-    });
+
+    }
+    return Promise.resolve();
 }

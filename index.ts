@@ -1,7 +1,6 @@
 import "reflect-metadata"
 //import 'express'
 import config from './src/config/config';
-import swaggerDocument from "./swagger.json";
 import { AppDataSource } from "./src/data-source"
 
 import express, { Response as ExResponse, Request as ExRequest, NextFunction } from "express";
@@ -16,7 +15,11 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/docs', swaggerUi.serve, async (_req: express.Request, res: express.Response) => {
+    return res.send(
+        swaggerUi.generateHTML(await import('./swagger.json'))
+    );
+});
 
 RegisterRoutes(app);
 

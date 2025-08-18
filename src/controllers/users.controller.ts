@@ -5,38 +5,36 @@ import {
   Get,
   Path,
   Post,
+  Res,
   Route,
   Security,
   SuccessResponse,
+  TsoaResponse,
 } from "@tsoa/runtime";
 import { UsersService } from "../service/usersService";
 import { GetUser, Register, Registered } from "../interface/user";
 
-@Route("api/users")
+@Route("users")
 export class UsersController extends Controller {
   @SuccessResponse("200", "OK") // Custom success response
   @Security('jwt', ['user'])
   @Get("{userId}")
   public async getUser(
     @Path() userId: string,
-  ): Promise<GetUser | { message: string }> {
-    console.log("userId received:", userId)
+  ): Promise<GetUser> {
     const result = await new UsersService().get(userId);
-    if ('error' in result) {
-      this.setStatus(403); // or another appropriate status
-      return { message: result.message };
-    }
     return result as GetUser;
   }
 
   @SuccessResponse("200", "OK") // Custom success response
   @Security('jwt', ['admin'])
   @Get("")
-  public async getUsers(): Promise<GetUser[] | { message: string }> {
+  public async getUsers(
+    @Res() res403: TsoaResponse<403, { message: string }>
+  ): Promise<GetUser[]> {
     const result = await new UsersService().get();
-    if ('error' in result) {
-      this.setStatus(403); // or another appropriate status
-      return { message: result.message };
+    if (result && 'error' in result) {
+      return res403(403, { message: result.message });
     }
     return result as GetUser[];
   }

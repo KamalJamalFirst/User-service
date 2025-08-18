@@ -6,7 +6,7 @@
   "spec": {
     "outputDirectory": ".",
     "specVersion": 3,
-    "basePath": ".",
+    "basePath": "/api",
     "securityDefinitions": {
       "jwt": {
         "type": "apiKey",

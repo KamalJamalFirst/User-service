@@ -125,7 +125,7 @@
 		"contact": {}
 	},
 	"paths": {
-		"/api/users/{userId}": {
+		"/users/{userId}": {
 			"get": {
 				"operationId": "GetUser",
 				"responses": {
@@ -134,22 +134,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/GetUser"
-										},
-										{
-											"properties": {
-												"message": {
-													"type": "string"
-												}
-											},
-											"required": [
-												"message"
-											],
-											"type": "object"
-										}
-									]
+									"$ref": "#/components/schemas/GetUser"
 								}
 							}
 						}
@@ -174,7 +159,7 @@
 				]
 			}
 		},
-		"/api/users": {
+		"/users": {
 			"get": {
 				"operationId": "GetUsers",
 				"responses": {
@@ -183,25 +168,28 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"items": {
-												"$ref": "#/components/schemas/GetUser"
-											},
-											"type": "array"
-										},
-										{
-											"properties": {
-												"message": {
-													"type": "string"
-												}
-											},
-											"required": [
-												"message"
-											],
-											"type": "object"
+									"items": {
+										"$ref": "#/components/schemas/GetUser"
+									},
+									"type": "array"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
 										}
-									]
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
 								}
 							}
 						}
@@ -256,7 +244,7 @@
 	},
 	"servers": [
 		{
-			"url": "/."
+			"url": "/api"
 		}
 	]
 }
