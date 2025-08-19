@@ -14,7 +14,7 @@ This service provides the following key functionalities via its API endpoints:
 - 🔑 **User Authorization** – Log in to receive an authentication token (JWT).  
 - 📄 **Get User by ID** – Retrieve a single user's details *(restricted to admins or the user themselves)*.  
 - 📋 **Get All Users** – Access a list of all registered users *(admins only)*.  
-- 🚫 **Block User** – Change a user's status to inactive *(admins or the user themselves)*.  
+- 🚫 **Disable User** – Change a user's status to disabled *(admins or the user themselves)*.  
 
 ---
 
