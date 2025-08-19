@@ -88,17 +88,16 @@ src/
 | Endpoint             | Method | Auth Required | Role      |
 |----------------------|--------|---------------|-----------|
 | `/users/register`    | POST   | ❌            | Public    |
-| `/users/login`       | POST   | ❌            | Public    |
 | `/users/:id`         | GET    | ✅            | Admin/User|
 | `/users`             | GET    | ✅            | Admin     |
-| `/users/:id/block`   | PATCH  | ✅            | Admin/User|
+| `/users/disable/:id` | PUT    | ✅            | Admin/User|
  
 ---
 
 ## ☑️ To-Do / Roadmap
 - [x] Implement JWT authentication  
 - [x] Add Swagger docs with tsoa  
-- [ ] Add role-based permissions  
+- [x] Add role-based permissions  
 - [ ] Add unit & integration tests  
 
 ---
