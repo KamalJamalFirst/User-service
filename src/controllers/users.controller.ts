@@ -56,7 +56,7 @@ export class RegisterController extends Controller {
 @Route("api/disable")
 export class DisableController extends Controller {
   @SuccessResponse("201", "Created") // Custom success response
-  @Security('jwt', ['admin'])
+  @Security('jwt', ['admin', 'user'])
   @Put("{userId}")
   public async disableUser(
     @Path() userId: string

@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { Entity, Column, PrimaryColumn } from "typeorm"
+import { Entity, Column, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm"
 
 @Entity()
 export class Users {
@@ -32,6 +32,9 @@ export class Users {
 @Entity()
 export class DisabledTokens {
 
-    @PrimaryColumn()
-    token: string;
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column()
+    userId: string;
 }

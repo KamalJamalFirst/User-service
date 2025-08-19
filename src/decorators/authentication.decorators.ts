@@ -1,6 +1,6 @@
 import { Request } from "express";
 import * as jwt from "jsonwebtoken";
-import { checkDisabled } from "../helpers/checkDisabled";
+import { isTokenDisabled } from "../helpers/checkDisabled";
 
 export async function expressAuthentication(
   request: Request,
@@ -25,24 +25,29 @@ export async function expressAuthentication(
     } catch (err) {
         throw new Error("Invalid token" );
     }
-    const isDisabled = await checkDisabled(token);
+    const isDisabled = await isTokenDisabled(decoded.id);
     if (isDisabled) {
-        throw new Error("You dont have an access. User was disabled" );
+        throw new Error("Access denied. User already disabled" );
     }
 
     if (scopes && scopes.length > 0) {
-        if (decoded.role !== scopes[0]) {
-            //console.log("Access denied for role:", decoded);
-            
-            throw new Error("You dont have an access" );
-        }
+        console.log("Decoded JWT:", decoded, "Scopes:", scopes);
 
-        if (decoded.role === 'user') {
+
+        if (decoded.role === 'user' || scopes[1]) {
             const userId = request.url.split('/').pop();
             if (userId !== decoded.id) {
                 throw new Error("User are only allowed to get info about himself");
                 // return Promise.reject({ status: 403, message: 'User are only allowed to get info about himself' });
             }
+            return Promise.resolve();
+        }
+
+
+        if (decoded.role !== scopes[0]) {
+            //console.log("Access denied for role:", decoded);
+            
+            throw new Error("You dont have an access" );
         }
 
     }

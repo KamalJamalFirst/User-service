@@ -103,7 +103,9 @@ export class UsersService {
     existingUser.status = 'disabled';
     await userRepository.save(existingUser);
     const disabledRepository = AppDataSource.getRepository(DisabledTokens);
-    disabledRepository.insert({ token: id });
+    const user = new DisabledTokens();
+    user.userId = id;
+    await disabledRepository.save(user);
     return { message: `User ${id} was disabled` };
   }
 
