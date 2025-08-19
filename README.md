@@ -92,7 +92,7 @@ src/
 | `/users/:id`         | GET    | ✅            | Admin/User|
 | `/users`             | GET    | ✅            | Admin     |
 | `/users/:id/block`   | PATCH  | ✅            | Admin/User|
-
+ 
 ---
 
 ## ☑️ To-Do / Roadmap
